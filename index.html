@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daily Site Plan</title>
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#E8192C">
+<!-- iOS PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Work Plan">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script>
@@ -1438,6 +1446,16 @@ function clearAll() {
 }
 
 renderEntries();
+</script>
+
+<script>
+// Register service worker for PWA offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .catch(() => { /* SW registration failed silently (e.g. file:// protocol) */ });
+  });
+}
 </script>
 </body>
 </html>
