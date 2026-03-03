@@ -933,6 +933,17 @@ function clearAll() {
 
 renderEntries();
 
+// ── HARD REFRESH ─────────────────────────────────────────────────────────────
+function hardRefresh() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations()
+      .then(registrations => Promise.all(registrations.map(reg => reg.unregister())))
+      .then(() => { window.location.reload(true); });
+  } else {
+    window.location.reload(true);
+  }
+}
+
 // ── PWA SERVICE WORKER REGISTRATION ──────────────────────────────────────────
 // Register service worker for PWA offline support
 if ('serviceWorker' in navigator) {

@@ -36,6 +36,9 @@
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
       <div class="header-date" id="header-date"></div>
+      <button class="header-settings-btn" onclick="hardRefresh()" title="Refresh App">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      </button>
       <button class="header-settings-btn" onclick="openSettings()" title="Settings">⚙️</button>
     </div>
   </div>
@@ -214,8 +217,6 @@
       <h1 class="page-title">Site <span>Operations</span><br>Daily Plan</h1>
       <p class="page-subtitle">Vodafone Egypt — Field Operations</p>
     </div>
-
-    <img src="data/banner.jpg" class="page-logo" alt="Banner">
   </div>
 
   <form id="planForm" autocomplete="off">
@@ -263,18 +264,8 @@
 <div class="modal-overlay" id="settingsPanel">
   <div class="modal settings-modal">
     <div class="modal-title">⚙️ Settings</div>
-    <p class="modal-sub">Defaults are pre-filled on every new site entry. You can still edit each entry manually.</p>
-
-    <!-- Settings logo preview -->
-    <div class="settings-logo-preview">
-      <img src="LMP Big Logo.jpg" alt="Company Logo">
-      <p class="settings-logo-note">To update the app banner, replace data/banner.jpg in the project and redeploy</p>
-    </div>
-
     <!-- Section 1: Default Coordinator -->
     <div class="settings-section">
-      <div class="settings-section-title">Default Coordinator</div>
-      <div class="settings-section-sub">Pre-fills the Contact Person &amp; mobile on every new site entry.</div>
       <div class="field">
         <label>Name</label>
         <input type="text" id="settCoordName" list="settCoordList" placeholder="Search contact person…" autocomplete="off" oninput="onSettCoordInput()">
@@ -294,6 +285,7 @@
     </div>
 
     <div class="settings-footer">
+      <img src="LMP Big Logo.jpg" alt="Company Logo">
       <p>Daily Site Plan</p>
       <p>Version 1.0.0</p>
       <p>&copy; 2026 Landmark Plus. All rights reserved.</p>
