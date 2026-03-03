@@ -396,6 +396,22 @@ document.getElementById('sites-container').addEventListener('input', function(e)
     const match = TEAM.find(t => t.name.trim() === inp.value.trim());
     if (match)          { mobField.value = match.mob; }
     else if (!inp.value){ mobField.value = ''; }
+
+    // When Site Engineer is chosen, mirror the same name + mobile into Site Supervisor
+    if (inp.name === 'engineerName') {
+      const block = inp.closest('.site-block');
+      if (block) {
+        const supName = block.querySelector('[name="supervisorName"]');
+        const supMob  = block.querySelector('[name="supervisorMob"]');
+        if (match) {
+          if (supName) supName.value = match.name;
+          if (supMob)  supMob.value  = match.mob;
+        } else if (!inp.value) {
+          if (supName) supName.value = '';
+          if (supMob)  supMob.value  = '';
+        }
+      }
+    }
     return;
   }
 
