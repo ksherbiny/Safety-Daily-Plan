@@ -39,23 +39,33 @@ async function loadListsData() {
     if (!resp.ok) throw new Error(`HTTP ${resp.status} — ${resp.statusText}`);
     const buf  = await resp.arrayBuffer();
     const wb   = XLSX.read(buf, { type: 'array' });
+    console.log('[DailyPlan] Sheets:', wb.SheetNames);
     const ws   = wb.Sheets[wb.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-    console.log('[DailyPlan] lists.xlsx: parsed', rows.length, 'rows (including header)');
-    if (rows.length > 0) console.log('[DailyPlan] Header row:', rows[0]);
+    const ref  = ws['!ref'] || 'A1';
+    console.log('[DailyPlan] Sheet ref:', ref);
+
+    // Decode the sheet range to find the last row
+    const range  = XLSX.utils.decode_range(ref);
+    const maxRow = range.e.r;   // 0-based index of last row
+    console.log('[DailyPlan] Total rows in sheet (incl. header):', maxRow + 1);
+
+    // Read a cell value directly by 0-based row + col.
+    // Bypasses sheet_to_json to avoid any row-count truncation issues.
+    function cellVal(r, c) {
+      const cell = ws[XLSX.utils.encode_cell({ r, c })];
+      return cell !== undefined ? cell.v : '';
+    }
 
     // Reset arrays
     TEAM = []; CONTACTS = []; CARS = [];
     LIST_SUB_CONTRACTORS = []; LIST_SITE_TYPES = []; LIST_PROJECTS = [];
 
-    // Row 0 is the header; data starts at row 1
-    for (let i = 1; i < rows.length; i++) {
-      const r = rows[i];
-
+    // Row 0 is the header; data starts at row index 1
+    for (let i = 1; i <= maxRow; i++) {
       // Col A (0): Site Engineer name, Col B (1): Phone (stored as number in xlsx)
-      const teamName = String(r[0] || '').trim();
+      const teamName = String(cellVal(i, 0) || '').trim();
       if (teamName) {
-        const raw = r[1];
+        const raw = cellVal(i, 1);
         // Numeric Egyptian mobile: 10 digits stored without leading 0
         const mob = (typeof raw === 'number')
           ? '0' + String(raw)
@@ -64,24 +74,24 @@ async function loadListsData() {
       }
 
       // Col E (4): Contact Person, Col F (5): Phone
-      const contactName = String(r[4] || '').trim();
-      if (contactName) CONTACTS.push({ name: contactName, mob: String(r[5] || '').trim() });
+      const contactName = String(cellVal(i, 4) || '').trim();
+      if (contactName) CONTACTS.push({ name: contactName, mob: String(cellVal(i, 5) || '').trim() });
 
       // Col H (7): Sub-Contractor
-      const sub = String(r[7] || '').trim();
+      const sub = String(cellVal(i, 7) || '').trim();
       if (sub && !LIST_SUB_CONTRACTORS.includes(sub)) LIST_SUB_CONTRACTORS.push(sub);
 
       // Col I (8): Site Type
-      const stype = String(r[8] || '').trim();
+      const stype = String(cellVal(i, 8) || '').trim();
       if (stype && !LIST_SITE_TYPES.includes(stype)) LIST_SITE_TYPES.push(stype);
 
       // Col J (9): Project Name
-      const proj = String(r[9] || '').trim();
+      const proj = String(cellVal(i, 9) || '').trim();
       if (proj && !LIST_PROJECTS.includes(proj)) LIST_PROJECTS.push(proj);
 
       // Col L (11): Driver Name, Col M (12): Car Plate No.
-      const driverName = String(r[11] || '').trim();
-      if (driverName) CARS.push({ name: driverName, plate: String(r[12] || '').trim() });
+      const driverName = String(cellVal(i, 11) || '').trim();
+      if (driverName) CARS.push({ name: driverName, plate: String(cellVal(i, 12) || '').trim() });
     }
 
     console.log('[DailyPlan] Loaded — TEAM:', TEAM.length,
