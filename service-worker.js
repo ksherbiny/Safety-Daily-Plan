@@ -24,6 +24,8 @@ const APP_SHELL = [
   './icon-192.png',
   './icon-512.png',
   './data/lists.xlsx',
+  './data/banner.jpg',
+  './LMP Big Logo.jpg',
 ];
 
 // ── Install: pre-cache app shell ──────────────────────────────────────────────
