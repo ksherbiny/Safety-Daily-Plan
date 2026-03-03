@@ -317,6 +317,22 @@ const SITES={"1":["Cairo","2 Qasr El Doubara","30.04090118408200","31 22 22.00"]
   @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
   .site-block-new { animation: slideDown 0.28s ease; }
 
+  /* ── SETTINGS BUTTON ──────────────────────────────────────────────────────── */
+  .header-inner { gap: 10px; }
+  .header-settings-btn { background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.35); color: #fff; border-radius: 50%; width: 34px; height: 34px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; flex-shrink: 0; }
+  .header-settings-btn:hover { background: rgba(255,255,255,0.30); }
+
+  /* ── SETTINGS PANEL ───────────────────────────────────────────────────────── */
+  .settings-modal { max-width: 520px; max-height: 90vh; overflow-y: auto; }
+  .settings-section { background: var(--card-inner, #F7F8FA); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; }
+  .settings-section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem; color: #111827; margin-bottom: 3px; }
+  .settings-section-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 14px; line-height: 1.4; }
+  .settings-phone-readonly { background: #ECEEF2 !important; color: var(--muted) !important; cursor: default; }
+  .settings-save-btn { width: 100%; margin-top: 12px; padding: 11px; background: var(--red); color: #fff; border: none; border-radius: 10px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: background 0.15s; }
+  .settings-save-btn:hover { background: #c5101f; }
+  .settings-saved-indicator { display: none; font-size: 0.78rem; color: #059669; font-weight: 600; margin-top: 8px; text-align: center; }
+  .settings-saved-indicator.visible { display: block; }
+
   /* ── LISTS LOADING OVERLAY ───────────────────────────────────────────────── */
   #lists-loading { position:fixed; inset:0; background:var(--bg,#F0F2F5); display:flex; align-items:center; justify-content:center; z-index:9999; }
   #lists-loading.hidden { display:none; }
@@ -350,7 +366,10 @@ const SITES={"1":["Cairo","2 Qasr El Doubara","30.04090118408200","31 22 22.00"]
       <svg viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="rgba(255,255,255,0.2)"/><path d="M7 8h14M7 12h10M7 16h12M7 20h8" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
       Daily Site Plan
     </div>
-    <div class="header-date" id="header-date"></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="header-date" id="header-date"></div>
+      <button class="header-settings-btn" onclick="openSettings()" title="Settings">⚙️</button>
+    </div>
   </div>
 </header>
 
@@ -572,6 +591,52 @@ const SITES={"1":["Cairo","2 Qasr El Doubara","30.04090118408200","31 22 22.00"]
   </div>
 </div>
 
+<!-- SETTINGS PANEL -->
+<div class="modal-overlay" id="settingsPanel">
+  <div class="modal settings-modal">
+    <div class="modal-title">⚙️ Settings</div>
+    <p class="modal-sub">Defaults are pre-filled on every new site entry. You can still edit each entry manually.</p>
+
+    <!-- Section 1: Default Coordinator -->
+    <div class="settings-section">
+      <div class="settings-section-title">Default Coordinator</div>
+      <div class="settings-section-sub">Pre-fills the Contact Person &amp; mobile on every new site entry.</div>
+      <div class="field">
+        <label>Name</label>
+        <input type="text" id="settCoordName" list="settCoordList" placeholder="Search contact person…" autocomplete="off" oninput="onSettCoordInput()">
+        <datalist id="settCoordList"></datalist>
+      </div>
+      <div class="field">
+        <label>Phone</label>
+        <input type="tel" id="settCoordPhone" class="settings-phone-readonly" readonly placeholder="—">
+      </div>
+      <button class="settings-save-btn" onclick="saveCoordinator()">Save Coordinator</button>
+      <div class="settings-saved-indicator" id="coordSavedBadge">✓ Saved</div>
+    </div>
+
+    <!-- Section 2: Default Site Engineer -->
+    <div class="settings-section">
+      <div class="settings-section-title">Default Site Engineer</div>
+      <div class="settings-section-sub">Pre-fills the Site Supervisor &amp; mobile on every new site entry.</div>
+      <div class="field">
+        <label>Name</label>
+        <input type="text" id="settEngineerName" list="settEngineerList" placeholder="Search engineer…" autocomplete="off" oninput="onSettEngineerInput()">
+        <datalist id="settEngineerList"></datalist>
+      </div>
+      <div class="field">
+        <label>Phone</label>
+        <input type="tel" id="settEngineerPhone" class="settings-phone-readonly" readonly placeholder="—">
+      </div>
+      <button class="settings-save-btn" onclick="saveEngineer()">Save Engineer</button>
+      <div class="settings-saved-indicator" id="engSavedBadge">✓ Saved</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeSettings()">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- EMAIL MODAL -->
 <div class="modal-overlay" id="emailModal">
   <div class="modal">
@@ -706,6 +771,92 @@ async function loadListsData() {
 }
 
 
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+function openSettings() {
+  // Fill the settings datalists from the loaded arrays
+  const coordList = document.getElementById('settCoordList');
+  coordList.innerHTML = CONTACTS.map(c => `<option value="${c.name}">`).join('');
+  const engList = document.getElementById('settEngineerList');
+  engList.innerHTML = TEAM.map(t => `<option value="${t.name}">`).join('');
+  // Restore saved values
+  _restoreSettingsUI();
+  document.getElementById('settingsPanel').classList.add('open');
+}
+
+function closeSettings() {
+  document.getElementById('settingsPanel').classList.remove('open');
+}
+
+function _restoreSettingsUI() {
+  const coord = _getSavedCoord();
+  document.getElementById('settCoordName').value  = coord ? coord.name  : '';
+  document.getElementById('settCoordPhone').value = coord ? coord.phone : '';
+  const showCoord = !!(coord && coord.name);
+  document.getElementById('coordSavedBadge').classList.toggle('visible', showCoord);
+
+  const eng = _getSavedEng();
+  document.getElementById('settEngineerName').value  = eng ? eng.name  : '';
+  document.getElementById('settEngineerPhone').value = eng ? eng.phone : '';
+  const showEng = !!(eng && eng.name);
+  document.getElementById('engSavedBadge').classList.toggle('visible', showEng);
+}
+
+function _getSavedCoord() { try { return JSON.parse(localStorage.getItem('defaultCoordinator')); } catch(e) { return null; } }
+function _getSavedEng()   { try { return JSON.parse(localStorage.getItem('defaultEngineer'));   } catch(e) { return null; } }
+
+function onSettCoordInput() {
+  const name  = document.getElementById('settCoordName').value.trim();
+  const match = CONTACTS.find(c => c.name === name);
+  document.getElementById('settCoordPhone').value = match ? match.mob : '';
+}
+
+function onSettEngineerInput() {
+  const name  = document.getElementById('settEngineerName').value.trim();
+  const match = TEAM.find(t => t.name === name);
+  document.getElementById('settEngineerPhone').value = match ? match.mob : '';
+}
+
+function saveCoordinator() {
+  const name  = document.getElementById('settCoordName').value.trim();
+  const phone = document.getElementById('settCoordPhone').value.trim();
+  if (!name) { showToast('Enter a coordinator name first', 'error'); return; }
+  localStorage.setItem('defaultCoordinator', JSON.stringify({ name, phone }));
+  document.getElementById('coordSavedBadge').classList.add('visible');
+  showToast('✓ Default coordinator saved', 'success');
+}
+
+function saveEngineer() {
+  const name  = document.getElementById('settEngineerName').value.trim();
+  const phone = document.getElementById('settEngineerPhone').value.trim();
+  if (!name) { showToast('Enter an engineer name first', 'error'); return; }
+  localStorage.setItem('defaultEngineer', JSON.stringify({ name, phone }));
+  document.getElementById('engSavedBadge').classList.add('visible');
+  showToast('✓ Default engineer saved', 'success');
+}
+
+// Apply saved defaults to a freshly-created (empty) site block
+function applyDefaultContacts(block) {
+  const coord = _getSavedCoord();
+  if (coord && coord.name) {
+    const nf = block.querySelector('[name="contactName"]');
+    const mf = block.querySelector('[name="contactMob"]');
+    if (nf) nf.value = coord.name;
+    if (mf) mf.value = coord.phone || '';
+  }
+  const eng = _getSavedEng();
+  if (eng && eng.name) {
+    const nf = block.querySelector('[name="supervisorName"]');
+    const mf = block.querySelector('[name="supervisorMob"]');
+    if (nf) nf.value = eng.name;
+    if (mf) mf.value = eng.phone || '';
+  }
+}
+
+// Close settings panel when clicking the backdrop
+document.getElementById('settingsPanel').addEventListener('click', function(e) {
+  if (e.target === this) closeSettings();
+});
+
 // ── DATE ──────────────────────────────────────────────────────────────────────
 const today   = new Date();
 const yyyy    = today.getFullYear();
@@ -799,6 +950,7 @@ function createSiteBlock(animate) {
   block.querySelectorAll('.dateField').forEach(f => f.value = todayStr);
   if (animate) block.classList.add('site-block-new');
   applyDropdownOptions(block);
+  applyDefaultContacts(block);
   refreshSummary(block);
   return block;
 }
