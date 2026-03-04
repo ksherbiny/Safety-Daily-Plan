@@ -19,16 +19,10 @@
   .header-date { font-size: 0.78rem; font-weight: 500; background: rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 12px; color: rgba(255,255,255,0.92); }
 
   .container { max-width: 980px; margin: 0 auto; padding: 28px 16px 80px; }
-  .page-banner { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #E8192C 100%); border-radius: 16px; padding: 28px 32px; margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; box-shadow: 0 8px 32px rgba(232,25,44,0.25); }
-  .page-header-text { flex: 1; }
-  .page-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.7rem, 4.5vw, 2.6rem); line-height: 1.1; letter-spacing: -1px; color: #fff; margin-bottom: 6px; }
-  .page-title span { color: #ff6b7a; }
-  .page-subtitle { color: rgba(255,255,255,0.65); font-size: 0.88rem; margin-bottom: 0; }
+  .page-banner { width: 100%; height: auto; max-height: 250px; object-fit: cover; border-radius: 12px; margin-bottom: 28px; display: block; }
   .page-logo { height: 120px; width: auto; object-fit: contain; flex-shrink: 0; background: #fff; border-radius: 12px; padding: 10px 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
   @media(max-width: 600px) {
-    .page-banner { flex-direction: column; align-items: flex-start; padding: 20px 18px; gap: 16px; }
     .page-logo { height: 80px; align-self: flex-end; }
-    .page-title { font-size: clamp(1.4rem, 6vw, 2rem); }
   }
 
   /* ── SITE BLOCK ────────────────────────────────────────────── */

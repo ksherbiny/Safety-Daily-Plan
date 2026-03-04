@@ -281,12 +281,18 @@ function addSite() {
 }
 
 function removeSite(btn) {
-  const block  = getSiteBlock(btn);
+  const block = getSiteBlock(btn);
   if (document.querySelectorAll('.site-block').length <= 1) return;
-  block.style.transition = 'opacity 0.2s, transform 0.2s';
-  block.style.opacity    = '0';
-  block.style.transform  = 'translateY(-8px)';
-  setTimeout(() => { block.remove(); updateSiteUI(); }, 220);
+  showConfirm(
+    'Remove this site from the plan? This cannot be undone.',
+    'Remove',
+    () => {
+      block.style.transition = 'opacity 0.2s, transform 0.2s';
+      block.style.opacity    = '0';
+      block.style.transform  = 'translateY(-8px)';
+      setTimeout(() => { block.remove(); updateSiteUI(); }, 220);
+    }
+  );
 }
 
 // ── SITE ID AUTO-FILL ────────────────────────────────────────────────────────
