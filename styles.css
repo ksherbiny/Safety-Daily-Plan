@@ -271,6 +271,11 @@
   .modal-btn.primary:hover { background: #2563EB; }
   .modal-btn.cancel { background: var(--bg); color: var(--text); border: 1.5px solid var(--border); }
   .modal-btn.cancel:hover { border-color: #9CA3AF; }
+  .modal-btn.danger { background: #EF4444; color: #fff; box-shadow: 0 4px 14px rgba(239,68,68,0.25); }
+  .modal-btn.danger:hover { background: #DC2626; }
+  .confirm-modal { max-width: 360px; text-align: center; }
+  .confirm-icon { display: flex; justify-content: center; margin-bottom: 14px; }
+  .confirm-message { font-size: 0.92rem; color: var(--text); line-height: 1.55; margin: 0 0 4px; }
 
   .toast { display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #fff; border: 1.5px solid var(--border); border-radius: 13px; padding: 12px 20px; font-size: 0.86rem; font-weight: 600; z-index: 999; box-shadow: 0 8px 28px rgba(0,0,0,0.12); white-space: nowrap; }
   .toast.show { display: flex; align-items: center; gap: 7px; animation: fadeup 0.25s ease; }

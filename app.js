@@ -862,12 +862,42 @@ document.getElementById('emailModal').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
 
+// ── CONFIRM DIALOG ────────────────────────────────────────────────────────────
+function showConfirm(message, okLabel, onOk) {
+  const modal   = document.getElementById('confirmModal');
+  const msgEl   = document.getElementById('confirmMessage');
+  const okBtn   = document.getElementById('confirmOkBtn');
+  const cancelBtn = document.getElementById('confirmCancelBtn');
+  msgEl.textContent = message;
+  okBtn.textContent = okLabel;
+  modal.style.display = 'flex';
+
+  function close() {
+    modal.style.display = 'none';
+    okBtn.removeEventListener('click', handleOk);
+    cancelBtn.removeEventListener('click', handleCancel);
+    modal.removeEventListener('click', handleBackdrop);
+  }
+  function handleOk()      { close(); onOk(); }
+  function handleCancel()  { close(); }
+  function handleBackdrop(e) { if (e.target === modal) close(); }
+
+  okBtn.addEventListener('click', handleOk);
+  cancelBtn.addEventListener('click', handleCancel);
+  modal.addEventListener('click', handleBackdrop);
+}
+
 // ── ENTRIES ───────────────────────────────────────────────────────────────────
 function deleteEntry(id) {
-  if (!confirm('Delete this plan?')) return;
-  saveEntries(getEntries().filter(p => p._id !== id));
-  renderEntries();
-  showToast('Plan deleted', 'info');
+  showConfirm(
+    'Are you sure you want to delete this plan? This action cannot be undone.',
+    'Delete',
+    () => {
+      saveEntries(getEntries().filter(p => p._id !== id));
+      renderEntries();
+      showToast('Plan deleted', 'info');
+    }
+  );
 }
 
 function renderEntries() {
@@ -928,7 +958,11 @@ function renderEntries() {
 }
 
 function clearAll() {
-  if (confirm('Clear all saved entries?')) { localStorage.removeItem(KEY); renderEntries(); }
+  showConfirm(
+    'Are you sure you want to delete all saved plans? This action cannot be undone.',
+    'Delete',
+    () => { localStorage.removeItem(KEY); renderEntries(); }
+  );
 }
 
 renderEntries();

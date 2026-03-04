@@ -11,7 +11,7 @@
 */
 
 const CACHE_VERSION   = 'v1';
-const CACHE_NAME      = `daily-plan-${CACHE_VERSION}-20260303120000`;
+const CACHE_NAME      = `daily-plan-${CACHE_VERSION}-20260304120000`;
 
 // Files to pre-cache on install so the app works offline from the first visit
 const APP_SHELL = [
@@ -72,7 +72,14 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Everything else (icons, manifest, lists.xlsx, sites-data.js, …): cache-first
+  // data/ folder (lists.xlsx, banner.jpg, …): network-first so replaced files
+  // are always fetched fresh; falls back to cache when offline
+  if (pathname.includes('/data/')) {
+    event.respondWith(networkFirst(request));
+    return;
+  }
+
+  // Everything else (icons, manifest, sites-data.js, …): cache-first
   // with a silent background revalidation so cached copies stay fresh
   event.respondWith(cacheFirst(request));
 });
